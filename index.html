@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>バーコード読み取り</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+    }
+    h2 {
+      margin-top: 20px;
+    }
+    #reader {
+      width: 300px;
+      margin: auto;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📷 バーコード読み取り</h2>
+
+<div id="reader"></div>
+
+<button onclick="startScan()">▶ スキャン開始</button>
+
+<script>
+const GAS_URL = "ここにGASのURL貼る"; // ←差し替え
+
+let scanner;
+
+function startScan() {
+  scanner = new Html5Qrcode("reader");
+
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length) {
+      const cameraId = devices[0].id;
+
+      scanner.start(
+        cameraId,
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        (decodedText) => {
+          onScanSuccess(decodedText);
+        }
+      );
+    }
+  }).catch(err => {
+    alert("カメラ起動エラー：" + err);
+  });
+}
+
+function onScanSuccess(code) {
+  scanner.stop();
+
+  // ピッ音
+  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+  audio.play();
+
+  // 送信
+  fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify({ code: code })
+  })
+  .then(() => {
+    alert("登録完了：" + code);
+  })
+  .catch(() => {
+    alert("送信エラー");
+  });
+}
+</script>
+
+</body>
+</html>
