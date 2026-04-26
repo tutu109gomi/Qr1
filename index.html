@@ -40,32 +40,12 @@ let scanner;
 
 function startScan() {
   scanner = new Html5Qrcode("reader");
-
-  Html5Qrcode.getCameras().then(devices => {
-    if (devices && devices.length) {
-      Html5Qrcode.getCameras().then(devices => {
-  if (devices && devices.length) {
-
-    // 背面カメラを探す
-    const backCamera = devices.find(device =>
-      device.label.toLowerCase().includes("back") ||
-      device.label.toLowerCase().includes("rear")
-    );
-
-    const cameraId = backCamera ? backCamera.id : devices[0].id;
-
-    scanner.start(
-      cameraId,
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      (decodedText) => {
-        onScanSuccess(decodedText);
-      }
-    );
-  }
-});
+scanner.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  (decodedText) => onScanSuccess(decodedText)
+);
+ 
 
       scanner.start(
         cameraId,
