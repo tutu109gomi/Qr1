@@ -43,7 +43,29 @@ function startScan() {
 
   Html5Qrcode.getCameras().then(devices => {
     if (devices && devices.length) {
-      const cameraId = devices[0].id;
+      Html5Qrcode.getCameras().then(devices => {
+  if (devices && devices.length) {
+
+    // 背面カメラを探す
+    const backCamera = devices.find(device =>
+      device.label.toLowerCase().includes("back") ||
+      device.label.toLowerCase().includes("rear")
+    );
+
+    const cameraId = backCamera ? backCamera.id : devices[0].id;
+
+    scanner.start(
+      cameraId,
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      (decodedText) => {
+        onScanSuccess(decodedText);
+      }
+    );
+  }
+});
 
       scanner.start(
         cameraId,
